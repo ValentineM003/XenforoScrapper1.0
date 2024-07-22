@@ -194,21 +194,6 @@ def scrape_post_information(driver, source_thread_url, source_username, source_p
                                                                        "not(ancestor::div[contains(@class, 'bbCodeBlock-content')]) and "
                                                                        "@href]")))
 
-            # Find Redgifs links using span and iframe
-            redgif_spans = bb_wrapper_element.find_elements(By.XPATH,
-                                                            ".//span[@data-s9e-mediaembed='redgifs']")
-
-            redgif_links = []
-            for span in redgif_spans:
-                try:
-                    iframe = span.find_element(By.TAG_NAME, "iframe")
-                    src = iframe.get_attribute("src")
-                    if src and src.startswith("//redgifs.com/ifr/"):
-                        redgif_link = "https://redgifs.com/watch/" + src.split("/")[-1]
-                        redgif_links.append(redgif_link)
-                except NoSuchElementException:
-                    pass
-
             
             prefixes_to_exclude = # Filter out links starting with certain prefixes
 
@@ -222,7 +207,6 @@ def scrape_post_information(driver, source_thread_url, source_username, source_p
             return {
                 'unfurl_links': unfurl_links,
                 'external_links': external_links,
-                'redgif_links': redgif_links,
             }
 
         except Exception as e:
@@ -230,25 +214,9 @@ def scrape_post_information(driver, source_thread_url, source_username, source_p
             return {
                 'unfurl_links': [],
                 'external_links': [],
-                'redgif_links': [],
             }
 
-    def extract_saint_links(bb_wrapper_element):
-        try:
-            saint_iframe_links = []
 
-            iframe_divs = bb_wrapper_element.find_elements(By.CLASS_NAME, "generic2wide-iframe-div")
-            for iframe_div in iframe_divs:
-                iframe = iframe_div.find_elements(By.CLASS_NAME, "saint-iframe")
-                for saint_iframe in iframe:
-                    link = saint_iframe.get_attribute("src")
-                    if link:
-                        saint_iframe_links.append(link)
-
-            return saint_iframe_links
-        except Exception as e:
-            logging.error(f"Error extracting Saint links: {e}")
-            return []
 
     def extract_images(bb_wrapper_element):
         try:
@@ -353,17 +321,13 @@ def scrape_post_information(driver, source_thread_url, source_username, source_p
                 links_info = extract_links(bb_wrapper_element)
                 unfurl_links = links_info.get('unfurl_links', [])
                 external_links = links_info.get('external_links', [])
-                redgif_links = links_info.get('redgif_links', [])
                 bbimages = extract_images(bb_wrapper_element)
                 spoiler_info = extract_spoiler_info(bb_wrapper_element)
-                saint_links = extract_saint_links(bb_wrapper_element)
 
                 post_info = {
                     'text_content': text_content,
                     'unfurl_links': unfurl_links,
                     'external_links': external_links,
-                    'redgif_links': redgif_links,
-                    'saint_links': saint_links,
                     'bbimage_links': bbimages,
                     'spoiler_info': list(spoiler_info),  # Convert set to list
                 }
@@ -465,13 +429,11 @@ def replicate_and_post(driver, source_thread_url, source_username, source_passwo
                 ' '.join(post_info.get('text_content', '').split()),  # Remove extra spaces
                 ''.join([f'[img]{link}[/img]' for link in set(post_info.get('bbimage_links', []))]),
                 # Remove duplicates using set
-                '\n'.join(post_info.get('saint_links', [])),
                 '\n'.join(post_info.get('spoiler_info', [])),
                 '\n'.join(link for link in set(other_links['unfurl_links']) if
                           link not in unique_links and not unique_links.add(link)),
                 '\n'.join(other_links['external_links']),  # Include external links
-                '\n'.join(link for link in set(other_links['redgif_links']) if
-                          link not in unique_links and not unique_links.add(link)),
+
             ]
 
             content = '\n'.join(content_parts)
