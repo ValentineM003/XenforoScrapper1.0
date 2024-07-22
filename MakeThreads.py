@@ -177,6 +177,27 @@ def scrape_post_information(driver, source_thread_url, source_username, source_p
                                                                        "not(ancestor::div[contains(@class, 'bbCodeSpoiler')]) and "
                                                                        "not(ancestor::div[contains(@class, 'bbCodeBlock-content')]) and "
                                                                        "@href]")))
+            
+            prefixes_to_exclude = # Filter out links starting with certain prefixes
+
+            # Remove links that start with excluded prefixes
+            unfurl_links = [link for link in unfurl_links if
+                            not any(link.startswith(prefix) for prefix in prefixes_to_exclude)]
+            external_links = [link for link in external_links if
+                              not any(link.startswith(prefix) for prefix in prefixes_to_exclude)]
+
+            # Combine all link types into a dictionary
+            return {
+                'unfurl_links': unfurl_links,
+                'external_links': external_links,
+            }
+
+        except Exception as e:
+            logging.error(f"Error extracting links: {e}")
+            return {
+                'unfurl_links': [],
+                'external_links': [],
+            }
 
 
     def extract_images(bb_wrapper_element):
