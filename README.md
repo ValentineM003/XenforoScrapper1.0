@@ -1,6 +1,7 @@
 # XenforoScrapper1.0
 
 # This script automates the process of scraping posts from a source forum and replicating them to a destination forum using Selenium. It is designed to handle login, scrape content, filter out blacklisted content, and post the replicated content in a specified format.
+# it comes with other programs to make and scrape Thread links and names.
 
 Configuration
 To use this script, you need to configure several variables and file paths:
