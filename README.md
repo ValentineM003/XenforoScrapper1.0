@@ -5,14 +5,14 @@
 Configuration
 To use this script, you need to configure several variables and file paths:
 
-Credentials:
+# Credentials:
 
 source_username: Your username for the source forum.
 source_password: Your password for the source forum.
 destination_username: Your username for the destination forum.
 destination_password: Your password for the destination forum.
-URLs:
 
+# URLs:
 destination_success_url: The URL to navigate to after successfully logging in to the destination forum.
 destination_login_url: The login URL for the destination forum.
 source_success_url: The URL to navigate to after successfully logging in to the source forum.
