@@ -546,7 +546,7 @@ def get_destination_thread_url(destination_file_path, index):
         return None
 
 
-# Configure drivers (chrome,gecko,etc...)
+# Configure drivers (chrome,gecko,etc..)
 
 
 
